@@ -171,8 +171,10 @@ xsus_init ()
     // monitors. So it's ok to take the default. See:
     // https://developer.gnome.org/libwnck/stable/WnckScreen.html#WnckScreen.description
     // https://developer.gnome.org/gdk4/stable/GdkScreen.html#GdkScreen.description
-    if (! wnck_handle_get_default_screen (handle))
-        g_critical ("Default screen is NULL. Not an X11 system? Too bad.");
+    if (! wnck_handle_get_default_screen (handle)) {
+        g_warning ("Default screen is NULL. Not an X11 system? Too bad.");
+        exit (EXIT_FAILURE);
+    }
 
     // Parse the configuration files
     rules = parse_config ();
@@ -278,13 +280,6 @@ main (int argc,
     // Parse command line arguments
     gdk_init (&argc, &argv);
     parse_args (&argc, &argv);
-
-    // Check that running on X11 only not anything else
-    GdkDisplay *display = gdk_display_get_default ();
-    if (!GDK_IS_X11_DISPLAY (display)) {
-        g_printerr ("xsuspender: This program only works on X11, not on any other display server.\n");
-        exit (EXIT_FAILURE);
-    }
 
     // Make g_critical() always exit
     g_log_set_always_fatal (G_LOG_LEVEL_CRITICAL);
